@@ -16,8 +16,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
-            "name" => 'Admin User',
-            'email' => 'admin@gmail.com',
+            "name" => 'User',
+            'username' => 'user',
+            'email' => 'user@gmail.com',
         ]);
         User::factory(10)->create();
         $categories = [
@@ -34,7 +35,7 @@ class DatabaseSeeder extends Seeder
                 'slug' => \Illuminate\Support\Str::slug($category),
             ]);
 
-            Post::factory(100)->create();
+            // Post::factory(100)->create();
         }
     }
     // make seeder

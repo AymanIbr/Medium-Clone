@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
 {
@@ -13,9 +15,9 @@ class PostController extends Controller
      */
     public function index()
     {
-        $categories = Category::get();
-        $posts = Post::orderBy("created_at", "DESC")->simplePaginate(5);
-        return view('dashboard', compact('categories','posts'));
+        // $categories = Category::get();
+        $posts = Post::with('user')->orderBy("created_at", "DESC")->simplePaginate(5);
+        return view('posts.index', compact('posts'));
     }
 
     /**
@@ -23,7 +25,8 @@ class PostController extends Controller
      */
     public function create()
     {
-        //
+        $categories = Category::orderBy('created_at', 'DESC')->get();
+        return view('posts.create', compact('categories'));
     }
 
     /**
@@ -31,15 +34,43 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'title' => 'required|string|max:255',
+            'content' => 'required|string',
+            'category_id' => ['required', 'exists:categories,id']
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'errors' => $validator->errors()
+            ], 422);
+        }
+
+        $post = Post::create([
+            'title' => $request->input('title'),
+            'content' => $request->input('content'),
+            'category_id' => $request->input('category_id'),
+            'user_id' => Auth::id() ?? 1,
+            'publish_at' => now(),
+        ]);
+
+        $path = $request->file('image')->store('uploads', 'custom');
+        $post->image()->create([
+            'path' => $path,
+        ]);
+
+        return response()->json([
+            'message' => 'Saved Successfully',
+        ], 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Post $post)
+    public function show($username, Post $post)
     {
-        //
+        return view('posts.show', compact('post'));
     }
 
     /**
