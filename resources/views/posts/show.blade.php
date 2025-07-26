@@ -25,7 +25,7 @@
                 </div>
 
                 {{-- Clap Section --}}
-                <x-clap-button> </x-clap-button>
+                <x-clap-button :count="$post->claps()->count()" :postId="$post->id" :clapped="$post->isClappedBy(auth()->user())" />
 
                 {{--  --}}
 
@@ -43,7 +43,7 @@
                     </span>
                 </div>
                 {{-- Clap Section --}}
-                <x-clap-button> </x-clap-button>
+                <x-clap-button :count="$post->claps()->count()" :postId="$post->id" :clapped="$post->isClappedBy(auth()->user())" />
 
             </div>
         </div>
@@ -76,6 +76,35 @@
                     error: function(xhr) {
                         console.error(xhr.responseText);
                         alert('Something went wrong. Please try again.');
+                    }
+                });
+            });
+
+            $(document).on('click', '.clap-btn', function(e) {
+                e.preventDefault();
+                const button = $(this);
+                const postId = button.data('post-id');
+
+                $.ajax({
+                    url: '/posts/' + postId + '/clap',
+                    type: 'POST',
+                    success: function(response) {
+                        const buttons = $('.clap-btn[data-post-id="' + postId + '"]');
+
+                        buttons.each(function() {
+                            const btn = $(this);
+                            btn.find('.clap-count').text(response.count);
+
+                            if (response.status === 'clapped') {
+                                btn.removeClass('text-gray-500').addClass('text-blue-600');
+                            } else {
+                                btn.removeClass('text-blue-600').addClass('text-gray-500');
+                            }
+                        });
+
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
                     }
                 });
             });

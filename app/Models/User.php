@@ -61,6 +61,10 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
 
+    public function claps()
+    {
+        return $this->hasMany(Clap::class);
+    }
 
     public function following()
     {

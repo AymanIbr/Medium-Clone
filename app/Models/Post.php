@@ -47,6 +47,16 @@ class Post extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
+    public function claps()
+    {
+        return $this->hasMany(Clap::class, 'post_id');
+    }
+
+    public function isClappedBy(User $user)
+{
+    return $this->claps()->where('user_id', $user->id)->exists();
+}
+
     protected static function booted()
     {
         static::creating(function (Post $post) {

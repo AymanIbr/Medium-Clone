@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ClapController;
 use App\Http\Controllers\FollowController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\ProfileController;
@@ -25,6 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/@{username}/{post:slug}', [PostController::class, 'show'])->name('post.show');
 
     Route::post('/follow/{user}', [FollowController::class, 'toggle'])->name('follow.toggle');
+    Route::post('/posts/{post}/clap', [ClapController::class, 'toggle'])->middleware('auth');
 });
 
 
