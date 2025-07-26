@@ -63,8 +63,8 @@ class Post extends Model
     public function readTime($wordsPerMinute = 100)
     {
         $wordCount = str_word_count(strip_tags($this->content));
-        $minutes = ceil($wordCount / $wordsPerMinute);
+        $minutes = max(1, ceil($wordCount / $wordsPerMinute));
 
-        return max(1, $minutes);
+        return $minutes === 1 ? '1 min read' : $minutes . ' mins read';
     }
 }

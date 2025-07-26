@@ -13,10 +13,10 @@
                             <a href="{{ route('profile.show', $post->user) }}"
                                 class="hover:underline">{{ $post->user->name }}</a>
                             &middot;
-                            <a href="" class="text-emerald-600 font-bold">Follow</a>
+                            <x-follow-button :user="$post->user" />
                         </div>
                         <div class="flex gap-2 text-sm text-gray-500">
-                            {{ $post->readTime() }} min read
+                            {{ $post->readTime() }}
                             &middot;
                             {{ $post->created_at->format('M d, Y') }}
                         </div>
@@ -48,5 +48,39 @@
             </div>
         </div>
     </div>
+
+
+    @push('js')
+        <script>
+            $(document).on('click', '.follow-btn', function(e) {
+                e.preventDefault();
+
+                const button = $(this);
+                const userId = button.data('user-id');
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/follow/' + userId,
+                    data: {
+                        _token: '{{ csrf_token() }}'
+                    },
+                    success: function(response) {
+                        if (response.status === 'followed') {
+                            button.text('Unfollow');
+                            button.removeClass('text-emerald-600').addClass('text-red-600');
+                        } else if (response.status === 'unfollowed') {
+                            button.text('Follow');
+                            button.removeClass('text-red-600').addClass('text-emerald-600');
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error(xhr.responseText);
+                        alert('Something went wrong. Please try again.');
+                    }
+                });
+            });
+        </script>
+    @endpush
+
 
 </x-app-layout>
